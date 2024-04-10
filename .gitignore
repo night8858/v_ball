@@ -1,1 +1,23 @@
-/新建文件夹
+# 一般可执行文件
+/**/*.exe
+
+# Keil-DefaultCompiler工程忽略项
+/**/MDK-ARM/*
+# 不忽略Keil工程配置文件
+!/**/MDK-ARM/*.uvoptx
+!/**/MDK-ARM/*.uvprojx
+!/**/MDK-ARM/startup_*.s
+
+# armgcc-cmake工程忽略项
+/**/cmake-build-debug
+
+# VsCode编辑器忽略项
+/**/.vscode
+/**/workspace.code-workspace
+
+# Clion编辑器忽略项
+/**/.idea
+
+#Cubemax生成的Drivers文件夹和.mxproject
+/**/Drivers
+/**/.mxproject
