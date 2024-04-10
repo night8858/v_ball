@@ -1,0 +1,9 @@
+*** Using Compiler 'V5.06 update 5 (build 528)', folder: 'D:\D P J\ARM\ARMCC\Bin'
+Build target 'v_ball'
+compiling main.c...
+..\applications\chassis.h(58): error:  #20: identifier "pid_type_def" is undefined
+      pid_type_def gimbal_motor_gyro_pid;
+../Core/Src/main.c: 0 warnings, 1 error
+"v_ball\v_ball.axf" - 1 Error(s), 0 Warning(s).
+Target not created.
+Build Time Elapsed:  00:00:02
