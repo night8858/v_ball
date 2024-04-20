@@ -291,5 +291,3 @@ static void motor_feedback_update(motor_control_t *feedback_update)
     feedback_update->M3508_M4.motor_speed = feedback_update->M3508_M4.chassis_motor_measure->speed_rpm;
     //数据更新,各个动力电机的速度数据
 }
-
-void movtion
