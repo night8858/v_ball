@@ -5,6 +5,7 @@
 #include "can_recv.h"
 #include "user_lib.h"
 #include "remote_control.h"
+#include "bsp_usart.h"
 
 /*对应电机数据,0~3 为1~4号动力电机3508,4~7为1~4号航向电机6020
 
@@ -25,6 +26,7 @@ extern motor_measure_t    motor_Date[8];
 motor_control_t motor_control;
 
 extern RC_ctrl_t rc_ctrl;
+extern UART_HandleTypeDef huart1;
 
 static int16_t M1_can_set_current = 0;
 
@@ -40,9 +42,12 @@ static int16_t M1_can_set_current = 0;
     {                                                                                   \
         M6020_PID_clear(&(motor_clear)->M6020_M1.gimbal_motor_relative_angle_pid);    \
         PID_clear(&(motor_clear)->M6020_M1.gimbal_motor_gyro_pid);                     \
-                                                                                        \
-        M6020_PID_clear(&(motor_clear)->M6020_M1.gimbal_motor_relative_angle_pid);    \
-        PID_clear(&(motor_clear)->M6020_M1.gimbal_motor_gyro_pid);                      \
+        M6020_PID_clear(&(motor_clear)->M6020_M2.gimbal_motor_relative_angle_pid);    \
+        PID_clear(&(motor_clear)->M6020_M2.gimbal_motor_gyro_pid);                      \
+        M6020_PID_clear(&(motor_clear)->M6020_M3.gimbal_motor_relative_angle_pid);    \
+        PID_clear(&(motor_clear)->M6020_M3.gimbal_motor_gyro_pid);                      \
+        M6020_PID_clear(&(motor_clear)->M6020_M4.gimbal_motor_relative_angle_pid);    \
+        PID_clear(&(motor_clear)->M6020_M4.gimbal_motor_gyro_pid);                      \
                                                                                         \
         PID_clear(&(motor_clear)->M3508_M1.chassis_motor_gyro_pid);                     \
         PID_clear(&(motor_clear)->M3508_M2.chassis_motor_gyro_pid);                     \
@@ -71,20 +76,28 @@ void chassisTask(void const * argument)
     motor_init(&motor_control);
     while (1)
     {
-
+        //取得回传数据结构体
         motor_feedback_update(&motor_control);
+
+        //获取遥控器数据结构体测试
         motor_control.M6020_M1.relative_angle_set = (float)rc_ctrl.rc.ch[2] / 660 * PI;
+
+        //PID控制计算和输出循环
         motor_control_loop(&motor_control);
+        uart_dma_printf(&huart1,"%4.3f ,%4.3f\n",motor_control.M6020_M1.relative_angle , motor_control.M6020_M1.relative_angle_set);
+
         osDelay(2);
     }
       
 }
 
+
+//电机数据的初始化
 static void motor_init(motor_control_t *init)
 {
 
-    static const fp32 M6020_M1_speed_pid[3] = {M6020_MOTOR_SPEED_PID_KP, M6020_MOTOR_SPEED_PID_KI, M6020_MOTOR_SPEED_PID_KD};
-    static const fp32 M3508_M1_speed_pid[3] = {M3505_MOTOR_SPEED_PID_KP, M3505_MOTOR_SPEED_PID_KI, M3505_MOTOR_SPEED_PID_KD};
+    static const fp32 M6020_speed_pid[3] = {M6020_MOTOR_SPEED_PID_KP, M6020_MOTOR_SPEED_PID_KI, M6020_MOTOR_SPEED_PID_KD};
+    static const fp32 M3508_speed_pid[3] = {M3505_MOTOR_SPEED_PID_KP, M3505_MOTOR_SPEED_PID_KI, M3505_MOTOR_SPEED_PID_KD};
 
     //static const fp32 Yaw_speed_pid[3] = {YAW_SPEED_PID_KP, YAW_SPEED_PID_KI, YAW_SPEED_PID_KD};
     //电机数据指针获取
@@ -98,11 +111,25 @@ static void motor_init(motor_control_t *init)
     init->M3508_M4.chassis_motor_measure = get_3508_M4_motor_measure_point();
 
     //遥控器数据指针获取
-    //init->gimbal_rc_ctrl = get_remote_control_point();
+    //init->rc_ctrl = get_remote_control_point();
 
     M6020_PID_init(&init->M6020_M1.gimbal_motor_relative_angle_pid, M6020_MOTOR_POSION_PID_MAX_OUT, M6020_MOTOR_POSION_PID_MAX_IOUT, M6020_MOTOR_POSION_PID_KP, M6020_MOTOR_POSION_PID_KI, M6020_MOTOR_POSION_PID_KD);
-    PID_init(&init->M6020_M1.gimbal_motor_gyro_pid, PID_POSITION, M6020_M1_speed_pid, M6020_MOTOR_SPEED_PID_MAX_OUT, M6020_MOTOR_SPEED_PID_MAX_IOUT);
-    PID_init(&init->M3508_M1.chassis_motor_gyro_pid,PID_POSITION,M3508_M1_speed_pid,M3505_MOTOR_SPEED_PID_MAX_IOUT,M3505_MOTOR_SPEED_PID_MAX_OUT);
+    PID_init(&init->M6020_M1.gimbal_motor_gyro_pid, PID_POSITION, M6020_speed_pid, M6020_MOTOR_SPEED_PID_MAX_OUT, M6020_MOTOR_SPEED_PID_MAX_IOUT);
+
+    M6020_PID_init(&init->M6020_M2.gimbal_motor_relative_angle_pid, M6020_MOTOR_POSION_PID_MAX_OUT, M6020_MOTOR_POSION_PID_MAX_IOUT, M6020_MOTOR_POSION_PID_KP, M6020_MOTOR_POSION_PID_KI, M6020_MOTOR_POSION_PID_KD);
+    PID_init(&init->M6020_M2.gimbal_motor_gyro_pid, PID_POSITION, M6020_speed_pid, M6020_MOTOR_SPEED_PID_MAX_OUT, M6020_MOTOR_SPEED_PID_MAX_IOUT);
+
+    M6020_PID_init(&init->M6020_M3.gimbal_motor_relative_angle_pid, M6020_MOTOR_POSION_PID_MAX_OUT, M6020_MOTOR_POSION_PID_MAX_IOUT, M6020_MOTOR_POSION_PID_KP, M6020_MOTOR_POSION_PID_KI, M6020_MOTOR_POSION_PID_KD);
+    PID_init(&init->M6020_M3.gimbal_motor_gyro_pid, PID_POSITION, M6020_speed_pid, M6020_MOTOR_SPEED_PID_MAX_OUT, M6020_MOTOR_SPEED_PID_MAX_IOUT);
+
+    M6020_PID_init(&init->M6020_M4.gimbal_motor_relative_angle_pid, M6020_MOTOR_POSION_PID_MAX_OUT, M6020_MOTOR_POSION_PID_MAX_IOUT, M6020_MOTOR_POSION_PID_KP, M6020_MOTOR_POSION_PID_KI, M6020_MOTOR_POSION_PID_KD);
+    PID_init(&init->M6020_M4.gimbal_motor_gyro_pid, PID_POSITION, M6020_speed_pid, M6020_MOTOR_SPEED_PID_MAX_OUT, M6020_MOTOR_SPEED_PID_MAX_IOUT);
+
+    PID_init(&init->M3508_M1.chassis_motor_gyro_pid,PID_POSITION,M3508_speed_pid,M3505_MOTOR_SPEED_PID_MAX_IOUT,M3505_MOTOR_SPEED_PID_MAX_OUT);
+    PID_init(&init->M3508_M2.chassis_motor_gyro_pid,PID_POSITION,M3508_speed_pid,M3505_MOTOR_SPEED_PID_MAX_IOUT,M3505_MOTOR_SPEED_PID_MAX_OUT);
+    PID_init(&init->M3508_M3.chassis_motor_gyro_pid,PID_POSITION,M3508_speed_pid,M3505_MOTOR_SPEED_PID_MAX_IOUT,M3505_MOTOR_SPEED_PID_MAX_OUT);
+    PID_init(&init->M3508_M4.chassis_motor_gyro_pid,PID_POSITION,M3508_speed_pid,M3505_MOTOR_SPEED_PID_MAX_IOUT,M3505_MOTOR_SPEED_PID_MAX_OUT);
+
 
 
     //清除所有PID
@@ -111,7 +138,13 @@ static void motor_init(motor_control_t *init)
     motor_feedback_update(&motor_control);
 
     init->M6020_M1.relative_angle_set = init->M6020_M1.relative_angle;
+    init->M6020_M2.relative_angle_set = init->M6020_M2.relative_angle;
+    init->M6020_M3.relative_angle_set = init->M6020_M3.relative_angle;
+    init->M6020_M4.relative_angle_set = init->M6020_M4.relative_angle;
     init->M3508_M1.motor_speed_set = init->M3508_M1.motor_speed;
+    init->M3508_M2.motor_speed_set = init->M3508_M2.motor_speed;
+    init->M3508_M3.motor_speed_set = init->M3508_M3.motor_speed;
+    init->M3508_M4.motor_speed_set = init->M3508_M4.motor_speed;
 }
 
 
@@ -259,4 +292,4 @@ static void motor_feedback_update(motor_control_t *feedback_update)
     //数据更新,各个动力电机的速度数据
 }
 
-
+void movtion

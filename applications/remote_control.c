@@ -20,10 +20,14 @@
 #include "remote_control.h"
 
 #include "main.h"
-
+#include "usart.h"
+#include "chassis.h"
+#include "cmsis_os.h"
+#include "FreeRTOS.h"
 
 extern UART_HandleTypeDef huart3;
 extern DMA_HandleTypeDef hdma_usart3_rx;
+
 
 /**
   * @brief          remote control protocol resolution

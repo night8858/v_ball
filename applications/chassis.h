@@ -4,6 +4,7 @@
 #include "struct_typedef.h"
 #include "can_recv.h"
 #include "pid.h"
+#include "remote_control.h"
 
 #define PI 3.141592653824f
 
@@ -14,16 +15,16 @@
 #define M3505_MOTOR_SPEED_PID_MAX_IOUT 2000.0f
 
 
-
 #define M6020_MOTOR_SPEED_PID_KP 1.0f
 #define M6020_MOTOR_SPEED_PID_KI 0.0f
 #define M6020_MOTOR_SPEED_PID_KD 0.0f
 #define M6020_MOTOR_SPEED_PID_MAX_OUT 30000.0f
 #define M6020_MOTOR_SPEED_PID_MAX_IOUT 20000.0f
 
+
 #define M6020_MOTOR_POSION_PID_KP 30000.0f
-#define M6020_MOTOR_POSION_PID_KI 20.0f
-#define M6020_MOTOR_POSION_PID_KD 0.0f
+#define M6020_MOTOR_POSION_PID_KI 0.0f
+#define M6020_MOTOR_POSION_PID_KD 7.0f
 #define M6020_MOTOR_POSION_PID_MAX_OUT 30000.0f
 #define M6020_MOTOR_POSION_PID_MAX_IOUT 20000.0f
 
@@ -113,7 +114,7 @@ typedef struct
 
 typedef struct
 {
-    //const RC_ctrl_t *gimbal_rc_ctrl;
+    const RC_ctrl_t *rc_ctrl;
  
     motor_6020_t M6020_M1;
     motor_6020_t M6020_M2;

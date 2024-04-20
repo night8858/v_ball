@@ -21,6 +21,9 @@ typedef enum
     CAN_6020_M3_ID = 0x207,
     CAN_6020_M4_ID = 0x208,
 
+    DT7_RX_ch = 0x301,
+    DT7_RX_S  = 0x302,
+
 } can_msg_id_e;
 
 //rm motor data
