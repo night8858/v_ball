@@ -80,11 +80,12 @@ void chassisTask(void const * argument)
         motor_feedback_update(&motor_control);
 
         //获取遥控器数据结构体测试
-        motor_control.M6020_M1.relative_angle_set = (float)rc_ctrl.rc.ch[2] / 660 * PI;
-
+        motor_control.M6020_M1.relative_angle_set = (float)rc_ctrl.rc.ch[2] / 660 * PI;  //-pi到pi
+        motor_control.M3508_M1.motor_speed_set = (float)rc_ctrl.rc.ch[1] / 66 * 400;    // -4000到+4000
         //PID控制计算和输出循环
         motor_control_loop(&motor_control);
-        uart_dma_printf(&huart1,"%4.3f ,%4.3f\n",motor_control.M6020_M1.relative_angle , motor_control.M6020_M1.relative_angle_set);
+        //uart_dma_printf(&huart1,"%4.3f ,%4.3f\n",motor_control.M6020_M1.relative_angle , motor_control.M6020_M1.relative_angle_set);
+        uart_dma_printf(&huart1,"%4.3f ,%4.3f , %4.3f\n",motor_control.M3508_M1.motor_speed / 19, motor_control.M3508_M1.motor_speed_set / 19 , motor_control.M3508_M1.motor_speed - motor_control.M3508_M1.motor_speed_set);
 
         osDelay(2);
     }
@@ -291,3 +292,5 @@ static void motor_feedback_update(motor_control_t *feedback_update)
     feedback_update->M3508_M4.motor_speed = feedback_update->M3508_M4.chassis_motor_measure->speed_rpm;
     //数据更新,各个动力电机的速度数据
 }
+
+
