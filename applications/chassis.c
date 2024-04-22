@@ -302,10 +302,14 @@ static void movement_calc(void)
 
     motor_control.M3508_M1.motor_speed_set = set_speed;
     motor_control.M3508_M2.motor_speed_set = set_speed;
-    motor_control.M3508_M3.motor_speed_set = set_speed;
-    motor_control.M3508_M4.motor_speed_set = set_speed;
+    motor_control.M3508_M3.motor_speed_set = -set_speed;
+    motor_control.M3508_M4.motor_speed_set = -set_speed;
 
     motor_control.M6020_M1.relative_angle_set = set_angle;
+    motor_control.M6020_M2.relative_angle_set = set_angle;
+    motor_control.M6020_M3.relative_angle_set = set_angle;
+    motor_control.M6020_M4.relative_angle_set = set_angle;
+
     uart_dma_printf(&huart1,"%4.3f ,%4.3f\n",set_speed , set_angle);
 
     //motor_control.M6020_M1.relative_angle_set = ();
