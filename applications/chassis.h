@@ -148,4 +148,6 @@ static void M3508_motor_speed_control(motor_3508_t *chassis_motor);
 
 static void motor_feedback_update(motor_control_t *feedback_update);
 
+static void movement_calc(void);
+
 #endif 

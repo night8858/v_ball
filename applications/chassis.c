@@ -6,6 +6,7 @@
 #include "user_lib.h"
 #include "remote_control.h"
 #include "bsp_usart.h"
+#include "math.h"
 
 /*对应电机数据,0~3 为1~4号动力电机3508,4~7为1~4号航向电机6020
 
@@ -66,7 +67,7 @@ static void M6020_PID_clear(M6020_PID_t *M6020_pid_clear);
 static void M3508_motor_speed_control(motor_3508_t *chassis_motor);
 static void motor_control_loop(motor_control_t *control_loop);
 static void motor_feedback_update(motor_control_t *feedback_update);
-
+static void movement_calc(void);
 
 
 //主线程
@@ -78,14 +79,14 @@ void chassisTask(void const * argument)
     {
         //取得回传数据结构体
         motor_feedback_update(&motor_control);
-
+        movement_calc();
         //获取遥控器数据结构体测试
-        motor_control.M6020_M1.relative_angle_set = (float)rc_ctrl.rc.ch[2] / 660 * PI;  //-pi到pi
-        motor_control.M3508_M1.motor_speed_set = (float)rc_ctrl.rc.ch[1] / 66 * 400;    // -4000到+4000
+        //motor_control.M6020_M1.relative_angle_set = (float)rc_ctrl.rc.ch[2] / 660 * PI;  //-pi到pi
+        //motor_control.M3508_M1.motor_speed_set = (float)rc_ctrl.rc.ch[1] / 66 * 400;    // -4000到+4000
         //PID控制计算和输出循环
         motor_control_loop(&motor_control);
         //uart_dma_printf(&huart1,"%4.3f ,%4.3f\n",motor_control.M6020_M1.relative_angle , motor_control.M6020_M1.relative_angle_set);
-        uart_dma_printf(&huart1,"%4.3f ,%4.3f , %4.3f\n",motor_control.M3508_M1.motor_speed / 19, motor_control.M3508_M1.motor_speed_set / 19 , motor_control.M3508_M1.motor_speed - motor_control.M3508_M1.motor_speed_set);
+        //uart_dma_printf(&huart1,"%4.3f ,%4.3f , %4.3f\n",motor_control.M3508_M1.motor_speed / 19, motor_control.M3508_M1.motor_speed_set / 19 , motor_control.M3508_M1.motor_speed - motor_control.M3508_M1.motor_speed_set);
 
         osDelay(2);
     }
@@ -294,3 +295,18 @@ static void motor_feedback_update(motor_control_t *feedback_update)
 }
 
 
+static void movement_calc(void)
+{
+    float set_speed = (float)hypot(rc_ctrl.rc.ch[2] / 66 * 400 , rc_ctrl.rc.ch[3] / 66 * 400);
+    float set_angle = (float)atan2(rc_ctrl.rc.ch[2] , rc_ctrl.rc.ch[3]);
+
+    motor_control.M3508_M1.motor_speed_set = set_speed;
+    motor_control.M3508_M2.motor_speed_set = set_speed;
+    motor_control.M3508_M3.motor_speed_set = set_speed;
+    motor_control.M3508_M4.motor_speed_set = set_speed;
+
+    motor_control.M6020_M1.relative_angle_set = set_angle;
+    uart_dma_printf(&huart1,"%4.3f ,%4.3f\n",set_speed , set_angle);
+
+    //motor_control.M6020_M1.relative_angle_set = ();
+}
