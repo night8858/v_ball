@@ -151,7 +151,7 @@ static void motor_init(motor_control_t *init)
 
 
 
-
+//编码值转为弧度制
 static fp32 motor_ecd_to_angle_change(uint16_t ecd, uint16_t offset_ecd)
 {
     int32_t relative_ecd = ecd - offset_ecd;
@@ -167,7 +167,7 @@ static fp32 motor_ecd_to_angle_change(uint16_t ecd, uint16_t offset_ecd)
 }
 
 
-
+//6020的PID初始化
 static void M6020_PID_init(M6020_PID_t *pid, fp32 maxout, fp32 max_iout, fp32 kp, fp32 ki, fp32 kd)
 {
     if (pid == NULL)
@@ -185,7 +185,7 @@ static void M6020_PID_init(M6020_PID_t *pid, fp32 maxout, fp32 max_iout, fp32 kp
     pid->max_out = maxout;
 }
 
-
+//6020的PID计算
 static fp32 M6020_PID_calc(M6020_PID_t *pid, fp32 get, fp32 set, fp32 error_delta)
 {
     fp32 err;
@@ -207,6 +207,7 @@ static fp32 M6020_PID_calc(M6020_PID_t *pid, fp32 get, fp32 set, fp32 error_delt
     return pid->out;
 }
 
+//清除6020的PID
 static void M6020_PID_clear(M6020_PID_t *M6020_pid_clear)
 {
     if (M6020_pid_clear == NULL)
@@ -219,7 +220,7 @@ static void M6020_PID_clear(M6020_PID_t *M6020_pid_clear)
 
 }
 
-
+//电机主控制循环
 static void motor_control_loop(motor_control_t *control_loop)
 {
     if (control_loop == NULL)
@@ -242,6 +243,7 @@ static void motor_control_loop(motor_control_t *control_loop)
         CAN_cmd_3508(motor_control.M3508_M1.given_current , motor_control.M3508_M2.given_current , motor_control.M3508_M3.given_current , motor_control.M3508_M4.given_current);
 }
 
+//6020的pid计算
 static void M6020_motor_relative_angle_control(motor_6020_t *gimbal_motor)
 {
     if (gimbal_motor == NULL)
@@ -256,6 +258,7 @@ static void M6020_motor_relative_angle_control(motor_6020_t *gimbal_motor)
 
 }
 
+//3508的pid计算
 static void M3508_motor_speed_control(motor_3508_t *chassis_motor)
 {
     if (chassis_motor == NULL)
@@ -269,6 +272,7 @@ static void M3508_motor_speed_control(motor_3508_t *chassis_motor)
 
 }
 
+//各个电机的数据反馈
 static void motor_feedback_update(motor_control_t *feedback_update)
 {
     if (feedback_update == NULL)
@@ -294,11 +298,13 @@ static void motor_feedback_update(motor_control_t *feedback_update)
     //数据更新,各个动力电机的速度数据
 }
 
-
+//运动计算
 static void movement_calc(void)
 {
+    //此处为遥控器控制的方式
     float set_speed = (float)hypot(rc_ctrl.rc.ch[2] / 66 * 400 , rc_ctrl.rc.ch[3] / 66 * 400);
     float set_angle = (float)atan2(rc_ctrl.rc.ch[2] , rc_ctrl.rc.ch[3]);
+ 
 
     motor_control.M3508_M1.motor_speed_set = set_speed;
     motor_control.M3508_M2.motor_speed_set = set_speed;
@@ -310,7 +316,7 @@ static void movement_calc(void)
     motor_control.M6020_M3.relative_angle_set = set_angle;
     motor_control.M6020_M4.relative_angle_set = set_angle;
 
-    uart_dma_printf(&huart1,"%4.3f ,%4.3f\n",set_speed , set_angle);
+    //vofa调试用的代码
+    //uart_dma_printf(&huart1,"%4.3f ,%4.3f\n",set_speed , set_angle);
 
-    //motor_control.M6020_M1.relative_angle_set = ();
 }
