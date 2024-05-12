@@ -336,7 +336,11 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F407xx</Define>
               <Undefine></Undefine>
+<<<<<<< HEAD
               <IncludePath>../Core/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;../Drivers/CMSIS/Device/ST/STM32F4xx/Include;../Drivers/CMSIS/Include;../applications;../components/controller;../components/algorithm;../boards;../components/devices</IncludePath>
+=======
+              <IncludePath>../Core/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;../Drivers/CMSIS/Device/ST/STM32F4xx/Include;../Drivers/CMSIS/Include;../applications;../components/controller;../components/algorithm;../boards</IncludePath>
+>>>>>>> b3a0418a5b27561e2cd151db9d1c589be2f65e66
             </VariousControls>
           </Cads>
           <Aads>
@@ -561,6 +565,7 @@
                       <Undefine></Undefine>
                       <IncludePath></IncludePath>
                     </VariousControls>
+<<<<<<< HEAD
                   </Cads>
                 </FileArmAds>
               </FileOption>
@@ -671,6 +676,8 @@
                       <Undefine></Undefine>
                       <IncludePath></IncludePath>
                     </VariousControls>
+=======
+>>>>>>> b3a0418a5b27561e2cd151db9d1c589be2f65e66
                   </Cads>
                 </FileArmAds>
               </FileOption>
@@ -976,6 +983,7 @@
                       <Undefine></Undefine>
                       <IncludePath></IncludePath>
                     </VariousControls>
+<<<<<<< HEAD
                   </Cads>
                 </FileArmAds>
               </FileOption>
@@ -1151,6 +1159,8 @@
                       <Undefine></Undefine>
                       <IncludePath></IncludePath>
                     </VariousControls>
+=======
+>>>>>>> b3a0418a5b27561e2cd151db9d1c589be2f65e66
                   </Cads>
                 </FileArmAds>
               </FileOption>
