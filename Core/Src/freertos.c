@@ -49,6 +49,7 @@
 /* USER CODE END Variables */
 osThreadId defaultTaskHandle;
 osThreadId myTask02Handle;
+osThreadId INSHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -56,7 +57,8 @@ osThreadId myTask02Handle;
 /* USER CODE END FunctionPrototypes */
 
 void StartDefaultTask(void const * argument);
-extern void chassisTask(void const * argument);
+void chassisTask(void const * argument);
+void INS_Task(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -108,8 +110,12 @@ void MX_FREERTOS_Init(void) {
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* definition and creation of myTask02 */
-  osThreadDef(myTask02, chassisTask, osPriorityAboveNormal, 0, 1024);
+  osThreadDef(myTask02, chassisTask, osPriorityAboveNormal, 0, 512);
   myTask02Handle = osThreadCreate(osThread(myTask02), NULL);
+
+  /* definition and creation of INS */
+  osThreadDef(INS, INS_Task, osPriorityRealtime, 0, 1024);
+  INSHandle = osThreadCreate(osThread(INS), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -133,6 +139,42 @@ void StartDefaultTask(void const * argument)
     osDelay(1);
   }
   /* USER CODE END StartDefaultTask */
+}
+
+/* USER CODE BEGIN Header_chassisTask */
+/**
+* @brief Function implementing the myTask02 thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_chassisTask */
+__weak void chassisTask(void const * argument)
+{
+  /* USER CODE BEGIN chassisTask */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END chassisTask */
+}
+
+/* USER CODE BEGIN Header_INS_Task */
+/**
+* @brief Function implementing the INS thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_INS_Task */
+__weak void INS_Task(void const * argument)
+{
+  /* USER CODE BEGIN INS_Task */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END INS_Task */
 }
 
 /* Private application code --------------------------------------------------*/

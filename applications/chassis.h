@@ -129,6 +129,15 @@ typedef struct
 } motor_control_t;
 
 
+typedef struct
+{
+    float speed;
+    float angle;
+    float W;
+
+} chassis_move_date;
+
+extern void chassisTask(void const * argument);
 
 static void motor_init(motor_control_t *init);
 
